@@ -3,14 +3,10 @@ import ot
 import torch
 import numpy as np
 from utils import * 
-import itertools
 
 device=torch.device("cpu")
 if torch.cuda.is_available():
   device=torch.device("cuda")
-
-
-
 
 
 def Transformation(cost,sample):
