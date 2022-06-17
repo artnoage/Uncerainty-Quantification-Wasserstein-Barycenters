@@ -31,8 +31,8 @@ def objective(input, cost,  Data,constant):
 data_n=40
 collector_size=100
 constant=30
-collectorBary=torch.zeros((10,collector_size,NumberOfAtoms))
-collectorPot=torch.zeros((10,collector_size,data_n,NumberOfAtoms))
+BarycenterSet=torch.zeros((10,collector_size,NumberOfAtoms))
+PotentialSet=torch.zeros((10,collector_size,data_n,NumberOfAtoms))
 for i in range(collector_size):
     for j in range (10):
         print(i,j)
@@ -49,8 +49,8 @@ for i in range(collector_size):
         Mean.requires_grad=False
         Mean=Mean.reshape(data_n,NumberOfAtoms)
         Barycenter=torch.softmax(-constant*((torch.sum(Mean,dim=0))),dim=0)
-        collectorBary[j,i]=Barycenter
-        collectorPot[j,i]=Mean
+        BarycenterSet[j,i]=Barycenter
+        PotentialSet[j,i]=Mean
 
-torch.save(collectorBary,"Barycenter.pt")
-torch.save(collectorPot,"Potential.pt")
+torch.save(BarycenterSet,"BarycenterSet.pt")
+torch.save(PotentialSet,"PotentialSet.pt")
