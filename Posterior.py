@@ -97,7 +97,7 @@ n_samples = 12000000
 max_samples = 700
 batch_sz = 75
 prior_std = 0.01
-kappa = 1. / 30.
+kappa = 1. / 40.
 
 folder = './'
 
