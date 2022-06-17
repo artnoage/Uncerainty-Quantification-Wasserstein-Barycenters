@@ -1,22 +1,14 @@
-from utils import load_mnist,  replace_zeros
+from utils import *
 import torch
-import numpy as np
-import itertools
+
 
 device=torch.device("cpu")
 if torch.cuda.is_available():
     device=torch.device("cuda")
 
 Dim=28
-Partition = torch.linspace(0, 1, Dim,dtype=torch.float32).to(dtype=torch.float32)
-couples = np.array(np.meshgrid(Partition, Partition)).T.reshape(-1, 2)
-x=np.array(list(itertools.product(couples, repeat=2)))
-x = torch.from_numpy(x)
-a = x[:, 0]
-b = x[:, 1]
-C = torch.linalg.norm(a - b, axis=1) ** 2
-NumberOfAtoms= Dim**2
-C=C.reshape(NumberOfAtoms,NumberOfAtoms).to(device)
+NumberOfAtoms=Dim**2
+cost_mat = get_cost_mat(28, device, dtype=torch.float32)
 
 def Transformation(cost,sample):
     if sample.dim()==2:
@@ -48,7 +40,7 @@ for i in range(collector_size):
         Mean = torch.zeros((data_n*NumberOfAtoms)).to(device).to(torch.float32)
         Mean.requires_grad=True
         for k in range(2000):
-            obj=-objective(Mean,C, Archetypes,constant)
+            obj=-objective(Mean,cost_mat, Archetypes,constant)
             loss=obj
             loss.backward()
             with torch.no_grad():
