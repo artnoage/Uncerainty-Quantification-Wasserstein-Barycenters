@@ -1,21 +1,13 @@
-from utils import  get_sampler, show_barycenters 
+from utils import  *
 import torch
 import numpy as np
-import itertools
+
 
 device=torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 Dim=28
-Partition = torch.linspace(0, 1, Dim,dtype=torch.float32).to(dtype=torch.float32)
-couples = np.array(np.meshgrid(Partition, Partition)).T.reshape(-1, 2)
-x=np.array(list(itertools.product(couples, repeat=2)))
-x = torch.from_numpy(x)
-a = x[:, 0]
-b = x[:, 1]
-C = torch.linalg.norm(a - b, axis=1) ** 2
-NumberOfAtoms= Dim**2
-C=C.reshape(NumberOfAtoms,NumberOfAtoms).to(device)
+cost_mat = get_cost_mat(28, device, dtype=torch.float32)
 
 
 def get_c_concave(phi, cost_mat):
@@ -48,7 +40,7 @@ iterations=300
 Mean = torch.zeros((len(Archetypes)*len(Archetypes[0]))).to(device).to(torch.float32)
 Mean.requires_grad=True
 for i in range(iterations):
-    obj=-objective_function(Mean,C, BlurryArchetypes,1/constant)
+    obj=-objective_function(Mean,cost_mat, BlurryArchetypes,1/constant)
     loss=obj
     loss.backward()
     with torch.no_grad():
