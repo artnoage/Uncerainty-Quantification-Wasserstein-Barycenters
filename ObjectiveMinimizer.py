@@ -32,7 +32,6 @@ def objective_function(sample, cost_mat, cs, kappa):
 
 
 Archetypes= torch.load('Archetypes.pt').to(device).to(torch.float32)
-BlurryArchetypes=Archetypes
 
 constant=40
 iterations=300
@@ -40,7 +39,7 @@ iterations=300
 Mean = torch.zeros((len(Archetypes)*len(Archetypes[0]))).to(device).to(torch.float32)
 Mean.requires_grad=True
 for i in range(iterations):
-    obj=-objective_function(Mean,cost_mat, BlurryArchetypes,1/constant)
+    obj=-objective_function(Mean,cost_mat, Archetypes,1/constant)
     loss=obj
     loss.backward()
     with torch.no_grad():
