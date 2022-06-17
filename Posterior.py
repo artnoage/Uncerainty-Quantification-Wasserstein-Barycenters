@@ -1,25 +1,12 @@
 import torch
 import ot
 from math import ceil
-import numpy as np
-import itertools
 from tqdm import tqdm
-
+from utils import *
 
 device=torch.device('cpu')
 if torch.cuda.is_available():
   device=torch.device("cuda")
-
-
-def get_cost_mat(im_sz, device, dtype=torch.float32):
-    partition = torch.linspace(0, 1, im_sz)
-    couples = np.array(np.meshgrid(partition, partition)).T.reshape(-1, 2)
-    x = np.array(list(itertools.product(couples, repeat=2)))
-    x = torch.tensor(x, dtype=dtype, device=device)
-    a = x[:, 0]
-    b = x[:, 1]
-    C = torch.linalg.norm(a - b, axis=1) ** 2
-    return C.reshape((im_sz**2, -1))
 
 
 def get_c_concave(phi, cost_mat):
@@ -29,7 +16,6 @@ def get_c_concave(phi, cost_mat):
     m = phi.shape[1] // n
     phi_c, _ = (cost_mat - phi.reshape(M, m, n, 1)).min(dim=2)  # (M, m, n)
     return phi_c
-
 
 
 def objective_function(sample, cost_mat, cs, kappa):
@@ -107,11 +93,6 @@ def get_rho(x, sample, cost_mat, wght, sinkhorn_reg=1e-2):
     rho = wght @ wass_dist
     return rho.item()
 
-def replace_zeros(arr, replace_val=1e-6, sumdim=-1):
-    arr[arr < replace_val] = replace_val
-    arr /= arr.sum(dim=sumdim, keepdim=True)
-    return arr
-
 n_samples = 12000000
 max_samples = 700
 batch_sz = 75
@@ -122,8 +103,6 @@ folder = './'
 
 # UNCOMMENT
 #save_best(n_samples, batch_sz, folder, prior_std, kappa, device=device, max_samples=max_samples)
-
-
 
 sinkhorn_reg = 0.02
 replace_val = 1e-6
@@ -155,7 +134,6 @@ while weight_in_CS < threshold:
 
 idx = i if i < max_samples else max_samples - 1
 r = sorted_pairs[idx][0]
-
 
 
 mean_potentials = torch.load(folder + 'Mean.pt', map_location=sample.device).detach()
