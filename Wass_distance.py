@@ -2,7 +2,7 @@
 import ot
 import torch
 import numpy as np
-from utils import load_mnist, replace_zeros 
+from utils import * 
 import itertools
 
 device=torch.device("cpu")
@@ -26,15 +26,7 @@ def objective(firstmeasure, secondmeasure, cost, potential):
 
 A= torch.flatten(replace_zeros(load_mnist( 1, 3, device=device,size=(28,28))))
 Dim=int(np.sqrt(len(A)))
-Partition = torch.linspace(0, 1, Dim,dtype=torch.float32).to(dtype=torch.float32)
-couples = np.array(np.meshgrid(Partition, Partition)).T.reshape(-1, 2)
-x=np.array(list(itertools.product(couples, repeat=2)))
-x = torch.from_numpy(x)
-a = x[:, 0]
-b = x[:, 1]
-C = torch.linalg.norm(a - b, axis=1) ** 2
-NumberOfAtoms= Dim**2
-C=C.reshape(NumberOfAtoms,NumberOfAtoms).to(device)
+cost_mat = get_cost_mat(28, device, dtype=torch.float32)
 
 def wass_dis(mu,nu,cost):
     D = ot.sinkhorn(mu, nu,cost, reg=1e-3, numItermax=10000)
@@ -55,4 +47,4 @@ def wass_dis(mu,nu,cost):
 for i in range(1000):
     A1= torch.flatten(replace_zeros(load_mnist( 1, 6, device=device,size=(28,28))))
     A2= torch.flatten(replace_zeros(load_mnist( 1, 7, device=device,size=(28,28))))
-    wass_dis(A1,A2,C)
+    wass_dis(A1,A2,cost_mat)
