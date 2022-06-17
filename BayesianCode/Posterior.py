@@ -31,10 +31,11 @@ def get_c_concave(phi, cost_mat):
     return phi_c
 
 
+
 def objective_function(sample, cost_mat, cs, kappa):
     # 'sample' has size (M, m*n), where M is sample size or 1
     phi_c = get_c_concave(sample, cost_mat)  # (M, m, n)
-    phi_bar = phi_c.sum(dim=1)  # (M, n)
+    phi_bar = sample.reshape(*phi_c.shape).sum(dim=1)  # (M, n)
 
     logsumexp = -kappa * torch.logsumexp(-phi_bar / kappa, dim=-1)  # (M,)
     inner_prod = (phi_c * cs).sum(dim=(1, 2))  # (M,)
