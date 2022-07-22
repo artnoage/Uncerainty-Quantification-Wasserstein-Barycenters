@@ -326,19 +326,19 @@ def load_mnist(m, target_digit, device, size=(14, 14), dtype=torch.float32, seed
     mnist = MNIST('.', train=False, transform=transform, download=True)
     indexes = (mnist.targets == target_digit).nonzero().flatten().tolist()
     if seed:
-        torch.random.seed()
+        torch.manual_seed(seed)
     chosen = random.sample(indexes, m)
     cs = [mnist[i][0] for i in chosen]
     cs = torch.stack(cs).reshape(m, -1).type(dtype)
     return (cs / cs.sum(dim=-1, keepdims=True)).to(device)
 
 
-def get_sample_generator(prior_mean, n_batches, prior_std, verbose=False):
+def get_sample_generator(prior_mean, n_batches, prior_std, verbose=False, seed=0):
     def sample_generator():
         for i in range(n_batches):
             if verbose:
                 print(f"sampling batch {i}")
-            torch.manual_seed(i)
+            torch.manual_seed(seed + i)
             yield torch.normal(prior_mean, prior_std)
 
     return sample_generator
