@@ -77,7 +77,7 @@ if __name__ == '__main__':
     m = 30
     constant = 30  # inverse 'kappa' coefficient
     digit = 5
-    device = 'cpu'
+    device = 'cuda'
     seed_mnist = 0
     n_iter = 500
     out_name = f'digit{digit}_m{m}_seed{seed_mnist}'
